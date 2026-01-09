@@ -13,19 +13,22 @@ function MessageCard({ isActive }) {
   const curtainHintRef = useRef(null);
   const messageContentRef = useRef(null);
 
-  const message = `[Recipient Name],
+  const message = `My Cutie pie ${Anjali} 💖,
 
-Your personalized birthday message goes here.
+Happy Birthday to the most beautiful cutie girl🥰,
+not just by looks, but by heart and soul.
 
-You can write multiple paragraphs to express your feelings,
-share memories, and make this special day even more memorable.
+You came into my life like a blessing,
+and every day with you feels special.
+Your smile is my peace,
+your happiness is my priority.
 
-This template supports multiple lines and formatting,
-so feel free to customize it completely to fit your style.
+I hope this year gives you
+everything your heart desires 💫.
 
 Happy Birthday! 🎉
 
-— [Your Name]`;
+— [Rohit]`;
 
   // Handle page transitions
   useEffect(() => {
