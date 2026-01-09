@@ -6,16 +6,19 @@ import "./MessageCard.css";
 function MessageCard({ isActive }) {
   const [curtainsOpened, setCurtainsOpened] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
-  const prevIsActive = useRef(isActive);
 
   const curtainLeftRef = useRef(null);
   const curtainRightRef = useRef(null);
   const curtainHintRef = useRef(null);
   const messageContentRef = useRef(null);
 
-  const message = `My Cutie pie ${Anjali} 💖,
+  // ✅ FIX: names as strings
+  const recipientName = "Anjali";
+  const senderName = "Rohit";
 
-Happy Birthday to the most beautiful cutie girl🥰,
+  const message = `My Cutie Pie ${recipientName} 💖,
+
+Happy Birthday to the most beautiful cutie girl 🥰,
 not just by looks, but by heart and soul.
 
 You came into my life like a blessing,
@@ -24,151 +27,91 @@ Your smile is my peace,
 your happiness is my priority.
 
 I hope this year gives you
-everything your heart desires 💫.
+everything your heart desires 💫
 
 Happy Birthday! 🎉
 
-— [Rohit]`;
+— ${senderName} ❤️`;
 
-  // Handle page transitions
+  // 🎉 Confetti when page becomes active
   useEffect(() => {
-    // Only trigger on transition to active
-    if (isActive && !prevIsActive.current) {
-      setTimeout(() => setShowConfetti(true), 10);
+    if (isActive) {
+      setShowConfetti(true);
       const timer = setTimeout(() => setShowConfetti(false), 5000);
-      prevIsActive.current = isActive;
       return () => clearTimeout(timer);
     }
-
-    // Reset curtains when leaving page with smooth animation
-    if (!isActive && prevIsActive.current) {
-      setTimeout(() => {
-        setCurtainsOpened(false);
-
-        // Smooth reset animation
-        if (curtainLeftRef.current && curtainRightRef.current) {
-          const resetTimeline = gsap.timeline();
-
-          resetTimeline.to([curtainLeftRef.current, curtainRightRef.current], {
-            opacity: 1,
-            duration: 0.3,
-          });
-
-          resetTimeline.to(
-            [curtainLeftRef.current, curtainRightRef.current],
-            {
-              x: "0%",
-              rotationY: 0,
-              duration: 0.5,
-              ease: "power2.inOut",
-            },
-            0.3
-          );
-        }
-
-        if (messageContentRef.current) {
-          gsap.to(messageContentRef.current, {
-            opacity: 0,
-            scale: 0.9,
-            duration: 0.3,
-          });
-        }
-      }, 300);
-    }
-
-    prevIsActive.current = isActive;
-    return undefined;
   }, [isActive]);
 
+  // ✅ FIXED curtain open handler
   const handleOpenCurtains = () => {
-    if (!curtainsOpened) {
-      setCurtainsOpened(true);
+    if (curtainsOpened) return;
 
-      // Detect screen size for responsive animations
-      const isMobile = window.innerWidth <= 768;
-      const isSmallMobile = window.innerWidth <= 480;
+    console.log("CURTAIN CLICKED"); // 🔥 DEBUG (remove later)
 
-      // Adjust animation parameters based on screen size
-      const duration = isSmallMobile ? 1.2 : isMobile ? 1.4 : 1.5;
-      const rotationAngle = isSmallMobile ? 10 : isMobile ? 12 : 15;
+    setCurtainsOpened(true);
 
-      // Animate curtain hint fade out
+    // ✅ SAFE mobile detection
+    const isMobile = window.matchMedia("(max-width: 768px)").matches;
+    const isSmallMobile = window.matchMedia("(max-width: 480px)").matches;
+
+    const duration = isSmallMobile ? 1.1 : isMobile ? 1.3 : 1.5;
+    const rotationAngle = isSmallMobile ? 8 : isMobile ? 10 : 12;
+
+    // Hide hint
+    if (curtainHintRef.current) {
       gsap.to(curtainHintRef.current, {
         opacity: 0,
-        scale: 0.8,
+        scale: 0.9,
+        duration: 0.3,
+        ease: "power2.out",
+      });
+    }
+
+    const tl = gsap.timeline();
+
+    tl.to(
+      curtainLeftRef.current,
+      {
+        x: "-100%",
+        rotationY: -rotationAngle,
+        duration,
+        ease: "power3.inOut",
+      },
+      0
+    );
+
+    tl.to(
+      curtainRightRef.current,
+      {
+        x: "100%",
+        rotationY: rotationAngle,
+        duration,
+        ease: "power3.inOut",
+      },
+      0
+    );
+
+    // Fade curtains out
+    tl.to(
+      [curtainLeftRef.current, curtainRightRef.current],
+      {
+        opacity: 0,
         duration: 0.4,
-        ease: "power2.in",
-      });
+      },
+      duration - 0.3
+    );
 
-      // Animate curtains opening with 3D effect
-      const timeline = gsap.timeline();
-
-      timeline.to(
-        curtainLeftRef.current,
-        {
-          x: "-100%",
-          rotationY: -rotationAngle,
-          duration: duration,
-          ease: "power3.inOut",
-        },
-        0
-      );
-
-      timeline.to(
-        curtainRightRef.current,
-        {
-          x: "100%",
-          rotationY: rotationAngle,
-          duration: duration,
-          ease: "power3.inOut",
-        },
-        0
-      );
-
-      // Fade out curtains
-      timeline.to(
-        [curtainLeftRef.current, curtainRightRef.current],
-        {
-          opacity: 0,
-          duration: 0.5,
-          delay: isMobile ? 0.8 : 1,
-        },
-        0
-      );
-
-      // Reveal message content with smooth animation
-      timeline.to(
-        messageContentRef.current,
-        {
-          opacity: 1,
-          scale: 1,
-          duration: isMobile ? 0.8 : 1,
-          ease: "back.out(1.2)",
-          delay: isMobile ? 0.6 : 0.8,
-        },
-        0
-      );
-    }
-  };
-
-  // Handle touch events for mobile
-  const handleTouchStart = () => {
-    if (!curtainsOpened) {
-      // Add subtle scale effect on touch
-      gsap.to(curtainHintRef.current, {
-        scale: 0.95,
-        duration: 0.1,
-      });
-    }
-  };
-
-  const handleTouchEnd = () => {
-    if (!curtainsOpened) {
-      gsap.to(curtainHintRef.current, {
+    // Show message
+    tl.to(
+      messageContentRef.current,
+      {
+        opacity: 1,
         scale: 1,
-        duration: 0.1,
-      });
-    }
+        duration: isMobile ? 0.7 : 0.9,
+        ease: "back.out(1.2)",
+      },
+      duration - 0.2
+    );
   };
 
   return (
@@ -179,37 +122,23 @@ Happy Birthday! 🎉
         <div className="curtain-rod"></div>
 
         <div
-          className={`curtain-wrapper ${
-            curtainsOpened ? "opened opening" : ""
-          }`}
+          className={`curtain-wrapper ${curtainsOpened ? "opened" : ""}`}
           onClick={handleOpenCurtains}
-          onTouchStart={handleTouchStart}
-          onTouchEnd={handleTouchEnd}
+          onTouchEnd={handleOpenCurtains}   // ✅ IMPORTANT
           role="button"
-          tabIndex={curtainsOpened ? -1 : 0}
-          aria-label="Click or tap to open the curtains and reveal the birthday message"
-          onKeyDown={(e) => {
-            if ((e.key === "Enter" || e.key === " ") && !curtainsOpened) {
-              e.preventDefault();
-              handleOpenCurtains();
-            }
-          }}
+          aria-label="Tap to open curtains"
         >
-          <div ref={curtainLeftRef} className="curtain curtain-left"></div>
-          <div ref={curtainRightRef} className="curtain curtain-right"></div>
+          <div ref={curtainLeftRef} className="curtain curtain-left" />
+          <div ref={curtainRightRef} className="curtain curtain-right" />
+
           {!curtainsOpened && (
             <div ref={curtainHintRef} className="curtain-hint">
-              ✨ {window.innerWidth <= 768 ? "Tap" : "Click"} to Open ✨
+              ✨ Tap to Open ✨
             </div>
           )}
         </div>
 
-        <div
-          ref={messageContentRef}
-          className="message-content"
-          role="article"
-          aria-label="Birthday message"
-        >
+        <div ref={messageContentRef} className="message-content">
           <p className="typed-text">{message}</p>
         </div>
       </div>
