@@ -1,3 +1,6 @@
+.curtain-wrapper {
+  touch-action: manipulation;
+}
 /* Message Card Section */
 .message {
   padding: 15px 20px 20px;
