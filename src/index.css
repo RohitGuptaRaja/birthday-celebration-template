@@ -4,6 +4,7 @@
   -webkit-tap-highlight-color: transparent;
 }
 
+/* ===== HTML ===== */
 html {
   margin: 0;
   padding: 0;
@@ -20,7 +21,7 @@ body {
   color: #333;
   text-align: center;
 
-  /* ✅ MOBILE FIX */
+  /* ✅ VERY IMPORTANT FIXES */
   position: relative;
   overflow-x: hidden;
   overflow-y: auto;
@@ -28,11 +29,14 @@ body {
   min-height: 100vh;
   min-height: 100dvh;
 
+  pointer-events: auto;
+  touch-action: manipulation;
+
   -webkit-text-size-adjust: 100%;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
-  animation: fadeIn 800ms ease-out forwards;
+  animation: fadeIn 600ms ease-out forwards;
 }
 
 /* ===== ROOT ===== */
@@ -40,6 +44,9 @@ body {
   width: 100%;
   min-height: 100vh;
   min-height: 100dvh;
+
+  position: relative;
+  pointer-events: auto;
 }
 
 /* ===== FADE ANIMATION ===== */
